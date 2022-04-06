@@ -13,7 +13,7 @@ const New = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setError(" ");
+    setError("");
     try {
       let accounts;
       if (window.ethereum) {

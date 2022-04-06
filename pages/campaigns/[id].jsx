@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { Card } from "semantic-ui-react";
+import { Card, Grid, Button } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import viewInstance from "../../ethereum/viewInstance";
 import web3 from "../../ethereum/web3";
+import Contribute from "../../components/Contribute";
+import Link from "next/link";
 
 export async function getServerSideProps() {
   const router = useRouter();
@@ -12,6 +14,7 @@ export async function getServerSideProps() {
   return {
     props: {
       summary: {
+        address: router.query.id,
         minCont: summary[0],
         balance: summary[1],
         reqCount: summary[2],
@@ -62,7 +65,23 @@ export default ({ summary }) => {
     <div>
       <Layout>
         <h3>Campaign Show</h3>
-        {renderCards(summary)}
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={10}>{renderCards(summary)}</Grid.Column>
+            <Grid.Column width={6}>
+              <Contribute address={summary.address} />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Link href={`/campaigns/${summary.address}/requests`}>
+                <a>
+                  <Button primary>View Requests</Button>
+                </a>
+              </Link>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Layout>
     </div>
   );
