@@ -9,12 +9,12 @@ const Contribute = ({ address }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     const campaign = viewInstance(address);
     setLoading(true);
     setError("");
-    try{
+    try {
       let accounts;
       if (window.ethereum) {
         accounts = await window.ethereum.request({
@@ -26,10 +26,10 @@ const Contribute = ({ address }) => {
       console.log(accounts[0]);
       await campaign.methods.contribute().send({
         from: accounts[0],
-        value: web3.utils.toWei(value, 'ether')
+        value: web3.utils.toWei(value, "ether"),
       });
       router.replace(`/campaigns/${address}`);
-    }catch(err){
+    } catch (err) {
       setError(err.message);
     }
     setLoading(false);
@@ -47,7 +47,9 @@ const Contribute = ({ address }) => {
         ></Input>
       </Form.Field>
       <Message error header="Oops!" content={error} />
-      <Button loading={loading} primary>Contribute!</Button>
+      <Button loading={loading} primary>
+        Contribute!
+      </Button>
     </Form>
   );
 };

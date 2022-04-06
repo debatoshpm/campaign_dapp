@@ -1,28 +1,30 @@
 import React, { useState } from "react";
-import web3 from "../ethereum/web3";
-import viewInstance from "../ethereum/viewInstance";
+import web3 from "../../../../ethereum/web3";
+import viewInstance from "../../../../ethereum/viewInstance";
 import { Form, Message, Button, Input } from "semantic-ui-react";
 import Link from "next/link";
+import Layout from "../../../../components/Layout";
 import { useRouter } from "next/router";
-import Layout from "../components/Layout";
 
-export async function getServerSideProps() {
-  const router = useRouter();
-  return { address: router.query.id };
+export async function getServerSideProps(context) {
+  const { id } = context.query;
+  return { props: { address: id } };
 }
 
 export default ({ address }) => {
+  const router = useRouter();
   const [value, setValue] = useState("");
   const [description, setDescription] = useState("");
   const [recipient, setRecipient] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     const campaign = viewInstance(address);
     setLoading(true);
     setError("");
-    try {let accounts;
+    try {
+      let accounts;
       if (window.ethereum) {
         accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
@@ -32,7 +34,9 @@ export default ({ address }) => {
       }
 
       console.log(accounts[0]);
-      await campaign.methods.createRequest(description,web3.utils.toWei(value,'ether'),recipient).send({from: accounts[0]});
+      await campaign.methods
+        .createRequest(description, web3.utils.toWei(value, "ether"), recipient)
+        .send({ from: accounts[0] });
       router.push(`/campaigns/${address}/requests`);
     } catch (err) {
       setError(err.message);
@@ -43,7 +47,7 @@ export default ({ address }) => {
     <div>
       <Layout>
         <Link href={`/campaigns/${address}/requests`}>
-        <a>Back</a>
+          <a>Back</a>
         </Link>
         <h3>Create a Request</h3>
         <Form onSubmit={onSubmit} error={!!error}>
@@ -69,7 +73,9 @@ export default ({ address }) => {
             />
           </Form.Field>
           <Message error header="Oops!" content={error} />
-          <Button loading={loading} primary>Create!</Button>
+          <Button loading={loading} primary>
+            Create!
+          </Button>
         </Form>
       </Layout>
     </div>

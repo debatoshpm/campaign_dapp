@@ -89,4 +89,14 @@ describe("Campaigns", () => {
 
     assert(balance > 104);
   });
+  it("fetches the summary", async () => {
+    const manager = await campaign.methods.manager().call();
+    const data = await campaign.methods.getSummary().call();
+    assert.equal(data[4], manager);
+    assert.equal(data[0], 100);
+  });
+  it("fetches the request length", async () => {
+    const reqCount = await campaign.methods.getRequestsCount().call();
+    assert.equal(reqCount, 0);
+  });
 });

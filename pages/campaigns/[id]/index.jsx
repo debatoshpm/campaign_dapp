@@ -1,20 +1,19 @@
-import { useRouter } from "next/router";
 import React from "react";
 import { Card, Grid, Button } from "semantic-ui-react";
-import Layout from "../../components/Layout";
-import viewInstance from "../../ethereum/viewInstance";
-import web3 from "../../ethereum/web3";
-import Contribute from "../../components/Contribute";
+import Layout from "../../../components/Layout";
+import viewInstance from "../../../ethereum/viewInstance";
+import web3 from "../../../ethereum/web3";
+import Contribute from "../../../components/Contribute";
 import Link from "next/link";
 
-export async function getServerSideProps() {
-  const router = useRouter();
-  const campaign = viewInstance(router.query.id);
+export async function getServerSideProps(context) {
+  const { id } = context.query;
+  const campaign = viewInstance(id);
   const summary = await campaign.methods.getSummary().call();
   return {
     props: {
       summary: {
-        address: router.query.id,
+        address: id,
         minCont: summary[0],
         balance: summary[1],
         reqCount: summary[2],

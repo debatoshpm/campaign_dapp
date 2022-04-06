@@ -1,25 +1,28 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "../../../../components/Layout";
 import Link from "next/link";
 import { Button, Table } from "semantic-ui-react";
-import viewInstance from "../ethereum/viewInstance";
-import RequestRow from "../components/RequestRow";
+import viewInstance from "../../../../ethereum/viewInstance";
+import RequestRow from "../../../../components/RequestRow";
 
-export async function getServerSideProps() {
-  const router = useRouter();
-  const campaign = viewInstance(address);
+export async function getServerSideProps(context) {
+  const { id } = context.query;
+  const campaign = viewInstance(id);
   const reqCount = await campaign.methods.getRequestsCount().call();
-  const requests = await Promise.all(Array(parseInt(requestCount)).fill()).map(
-    (_element, index) => {
-      return campaign.methods.requests(index).call();
-    }
+  let requests = await Promise.all(
+    Array(parseInt(reqCount))
+      .fill()
+      .map((_element, index) => {
+        return campaign.methods.requests(index).call();
+      })
   );
+  requests = JSON.parse(JSON.stringify(requests));
   const approversCount = await campaign.methods.approversCount().call();
-  return { address: router.query.id, requests, reqCount, approversCount };
+  return { props: { address: id, requests, reqCount, approversCount } };
 }
 
-export default ({ address, requests, reqCount }) => {
-  const renderRow = () => {
+export default ({ address, requests, reqCount, approversCount }) => {
+  const RenderRow = () => {
     return requests.map((request, index) => {
       return (
         <RequestRow
@@ -55,7 +58,9 @@ export default ({ address, requests, reqCount }) => {
               <Table.HeaderCell>Finalize</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
-          <Table.Body>{renderRow}</Table.Body>
+          <Table.Body>
+            <RenderRow />
+          </Table.Body>
         </Table>
         <div>Found {reqCount} requests.</div>
       </Layout>
