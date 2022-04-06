@@ -1,0 +1,8 @@
+/node_modules
+/.next/
+/build
+.vscode
+/ethereum/build
+/ethereum/.env
+/ethereum/address.txt
+/next.config.js
